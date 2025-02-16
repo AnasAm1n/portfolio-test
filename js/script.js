@@ -1,64 +1,24 @@
 const navLinks = document.querySelectorAll('header nav a');
-const logoLink = document.querySelector('.logo');
-const sections = document.querySelectorAll('section');
 const menuIcon = document.querySelector('#menu-icon');
-const navbar = document.querySelector('header nav');
 
 menuIcon.addEventListener('click', () => {
     menuIcon.classList.toggle('bx-x');
-    navbar.classList.toggle('active');
+    document.querySelector('header nav').classList.toggle('active');
 });
 
-const activePage = () => {
-    const header = document.querySelector('header');
-    const barsBox = document.querySelector('.bars-box');
-
-    header.classList.remove('active');
-    setTimeout(() => {
-        header.classList.add('active');
-    }, 1100);
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-    });
-
-    barsBox.classList.remove('active');
-    setTimeout(() => {
-        barsBox.classList.add('active');
-    }, 1100);
-
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
-
-    menuIcon.classList.remove('bx-x');
-    navbar.classList.remove('active');
-}
-
-navLinks.forEach((link, idx) => {
-    link.addEventListener('click', () => { 
-       if (!link.classList.contains('active')) {
-        activePage();
-
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default anchor behavior
+        const targetId = link.getAttribute('href').substring(1); // Get target section ID
+        const targetSection = document.getElementById(targetId);
+        
+        // Smooth scroll to the target section
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Update active link
+        navLinks.forEach(link => link.classList.remove('active'));
         link.classList.add('active');
-
-        setTimeout(() => {
-            sections[idx].classList.add('active');
-        }, 1100);
-     }
- });
-});
-
-logoLink.addEventListener('click', () => {
-   if (!navLinks[0].classList.contains('active')) {
-    activePage();
-
-    navLinks[0].classList.add('active');
-
-    setTimeout(() => {
-        sections[0].classList.add('active');
-    }, 1100);
-   }
+    });
 });
 
 const resumeBtns = document.querySelectorAll('.resume-btn');
@@ -123,3 +83,27 @@ arrowLeft.addEventListener('click', () => {
 
     activePortfolio();
 })
+
+const sections = document.querySelectorAll('section');
+
+const options = {
+    root: null, // Use the viewport as the root
+    rootMargin: '0px',
+    threshold: 0.1 // Trigger when 10% of the section is visible
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active'); // Add active class when in view
+        } else {
+            entry.target.classList.remove('active'); // Remove active class when out of view
+        }
+    });
+}, options);
+
+// Observe each section
+sections.forEach(section => {
+    section.classList.add('section-animate'); // Add initial class for animation
+    observer.observe(section); // Start observing the section
+});
